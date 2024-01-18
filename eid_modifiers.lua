@@ -207,44 +207,19 @@ end
 
 -- Handle Glowing Hourglass description
 local function GlowingHourglassCallback(descObj)
-  local usesLeft = EID:getDescriptionEntry("GlowingHourglassUses")
-  print("Uses Str:")
-  print(usesLeft)
-  print("deskObj:")
-  print(descObj)
-  print(descObj.Type)
-  print(descObj.SubType)
-  print(descObj.Variant)
-  print(descObj.VarData)
-
-  print("glowingDesc:")
-  local glowingDesc = EID:getDescriptionData(descObj.Type, descObj.Variant, descObj.SubType)
-  print(glowingDesc)
-
-  local glowingDesc2 = EID.itemConfig:GetCollectible(descObj.ObjSubType).Description
-  print(glowingDesc2)
-
-  -- Hourglass Desc
-  print("Hourglass")
-  local hour = EID:getDescriptionObj(5, 100, 66)
-  print(hour)
-  
-  if not REPENTOGON then
-    -- return descObj
-  else
-    print("VarData")
-    local usesLeftInt = print(Isaac.GetPlayer():GetActiveItemDesc().VarData)
-    
-    if usesLeft ~= nil then
-      -- local iconStr = "#{{Collectible66}} "
-      -- local glowingIconStr = "#{{Collectible422}} "
-      
-      -- get subdata to determine uses left
-      local usesStr = "#{{Warning}} " ..usesLeft..usesLeftInt.."/3"
-      EID:appendToDescription(descObj, usesStr)
-    end
-  end
-  return descObj
+	if REPENTOGON then
+		local usedText = EID:getDescriptionEntry("GlowingHourglassUsed")
+		local transformedText = EID:getDescriptionEntry("GlowingHourglassTransformed")
+		local numUsesLeft = 3 - Isaac.GetPlayer():GetActiveItemDesc().VarData
+		if usedText ~= nil and numUsesLeft >= 1 then
+			local usesStr = "#{{Warning}} "..usedText.." "..numUsesLeft
+			EID:appendToDescription(descObj, usesStr)
+		elseif transformedText ~= nil then
+			-- Replace description with info text and a the description of The Hourglass
+			descObj.Description = transformedText.."#"..EID:getDescriptionObj(5, 100, 66).Description
+		end
+	end
+	return descObj
 end
 
 -- Handle Item Collection description addition
@@ -794,6 +769,8 @@ if EID.isRepentance then
 			-- Using magic numbers here in case it's slightly faster, and because the callback names give context
 			-- Check Birthright first because it overwrites the description instead of appending to it
 			if descObj.ObjSubType == 619 then table.insert(callbacks, BirthrightCallback) end
+			-- Glowing Hourglass overwrites the description when used three times
+			if REPENTOGON and descObj.ObjSubType == 422 then table.insert(callbacks, GlowingHourglassCallback) end
 			if descObj.ObjSubType == 644 then table.insert(callbacks, ConsolationPrizeCallback) end
 
 			if EID.collectiblesOwned[664] then table.insert(callbacks, BingeEaterCallback) end
@@ -850,8 +827,6 @@ local function EIDConditionsAB(descObj)
 		if EID.Config["ItemCollectionIndicator"] and EID:requiredForCollectionPage(descObj.ObjSubType) then table.insert(callbacks, ItemCollectionPageCallback) end
 
 		if descObj.ObjSubType == 297 then table.insert(callbacks, PandorasBoxCallback) end
-
-    if descObj.ObjSubType == 422 then table.insert(callbacks, GlowingHourglassCallback) end
 
 		if EID.Config["DisplayVoidStatInfo"] then
 			if EID.collectiblesOwned[477] then table.insert(callbacks, VoidCallback) end
