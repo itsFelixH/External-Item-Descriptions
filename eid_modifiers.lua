@@ -205,6 +205,48 @@ local function PandorasBoxCallback(descObj)
 	return descObj
 end
 
+-- Handle Glowing Hourglass description
+local function GlowingHourglassCallback(descObj)
+  local usesLeft = EID:getDescriptionEntry("GlowingHourglassUses")
+  print("Uses Str:")
+  print(usesLeft)
+  print("deskObj:")
+  print(descObj)
+  print(descObj.Type)
+  print(descObj.SubType)
+  print(descObj.Variant)
+  print(descObj.VarData)
+
+  print("glowingDesc:")
+  local glowingDesc = EID:getDescriptionData(descObj.Type, descObj.Variant, descObj.SubType)
+  print(glowingDesc)
+
+  local glowingDesc2 = EID.itemConfig:GetCollectible(descObj.ObjSubType).Description
+  print(glowingDesc2)
+
+  -- Hourglass Desc
+  print("Hourglass")
+  local hour = EID:getDescriptionObj(5, 100, 66)
+  print(hour)
+  
+  if not REPENTOGON then
+    -- return descObj
+  else
+    print("VarData")
+    print(Isaac.GetPlayer():GetActiveItemDesc().VarData)
+  end
+
+  if usesLeft ~= nil then
+    -- local iconStr = "#{{Collectible66}} "
+    -- local glowingIconStr = "#{{Collectible422}} "
+    
+    -- get subdata to determine uses left
+    local usesStr = "#{{Warning}} " ..usesLeft.. "/3"
+    EID:appendToDescription(descObj, usesStr)
+  end
+  return descObj
+end
+
 -- Handle Item Collection description addition
 local function ItemCollectionPageCallback(descObj)
 	descObj.Name = "{{"..EID.Config["ItemCollectionColor"].."}}"..descObj.Name
@@ -808,6 +850,8 @@ local function EIDConditionsAB(descObj)
 		if EID.Config["ItemCollectionIndicator"] and EID:requiredForCollectionPage(descObj.ObjSubType) then table.insert(callbacks, ItemCollectionPageCallback) end
 
 		if descObj.ObjSubType == 297 then table.insert(callbacks, PandorasBoxCallback) end
+
+    if EID.collectiblesOwned[422] then table.insert(callbacks, GlowingHourglassCallback) end
 
 		if EID.Config["DisplayVoidStatInfo"] then
 			if EID.collectiblesOwned[477] then table.insert(callbacks, VoidCallback) end
