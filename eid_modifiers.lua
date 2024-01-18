@@ -233,16 +233,16 @@ local function GlowingHourglassCallback(descObj)
     -- return descObj
   else
     print("VarData")
-    print(Isaac.GetPlayer():GetActiveItemDesc().VarData)
-  end
-
-  if usesLeft ~= nil then
-    -- local iconStr = "#{{Collectible66}} "
-    -- local glowingIconStr = "#{{Collectible422}} "
+    local usesLeftInt = print(Isaac.GetPlayer():GetActiveItemDesc().VarData)
     
-    -- get subdata to determine uses left
-    local usesStr = "#{{Warning}} " ..usesLeft.. "/3"
-    EID:appendToDescription(descObj, usesStr)
+    if usesLeft ~= nil then
+      -- local iconStr = "#{{Collectible66}} "
+      -- local glowingIconStr = "#{{Collectible422}} "
+      
+      -- get subdata to determine uses left
+      local usesStr = "#{{Warning}} " ..usesLeft..usesLeftInt.."/3"
+      EID:appendToDescription(descObj, usesStr)
+    end
   end
   return descObj
 end
@@ -851,7 +851,7 @@ local function EIDConditionsAB(descObj)
 
 		if descObj.ObjSubType == 297 then table.insert(callbacks, PandorasBoxCallback) end
 
-    if EID.collectiblesOwned[422] then table.insert(callbacks, GlowingHourglassCallback) end
+    if descObj.ObjSubType == 422 then table.insert(callbacks, GlowingHourglassCallback) end
 
 		if EID.Config["DisplayVoidStatInfo"] then
 			if EID.collectiblesOwned[477] then table.insert(callbacks, VoidCallback) end
